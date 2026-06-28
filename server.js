@@ -3,6 +3,7 @@ const fs = require('fs');
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
+const { generateRoomCode, calculatePoints, buildLeaderboard } = require('./lib/gameLogic');
 
 const app = express();
 const server = http.createServer(app);
@@ -10,31 +11,26 @@ const io = new Server(server);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-const questions = JSON.parse(
-  fs.readFileSync(path.join(__dirname, 'questions.json'), 'utf-8')
-);
+const PACKS_DIR = path.join(__dirname, 'packs');
+const packs = {};
+for (const file of fs.readdirSync(PACKS_DIR)) {
+  if (!file.endsWith('.json')) continue;
+  const id = file.replace(/\.json$/, '');
+  packs[id] = JSON.parse(fs.readFileSync(path.join(PACKS_DIR, file), 'utf-8'));
+}
+const packList = Object.entries(packs).map(([id, pack]) => ({
+  id,
+  topic: pack.topic,
+  count: pack.questions.length,
+}));
 
 const QUESTION_TIME_MS = 15000;
 const NEXT_QUESTION_DELAY_MS = 4000;
-const ROOM_CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
 
 const rooms = {};
 
-function generateRoomCode() {
-  let code;
-  do {
-    code = Array.from(
-      { length: 4 },
-      () => ROOM_CODE_CHARS[Math.floor(Math.random() * ROOM_CODE_CHARS.length)]
-    ).join('');
-  } while (rooms[code]);
-  return code;
-}
-
 function getLeaderboard(room) {
-  return Object.values(room.players)
-    .map((p) => ({ name: p.name, score: p.score }))
-    .sort((a, b) => b.score - a.score);
+  return buildLeaderboard(room.players);
 }
 
 function nextQuestion(code) {
@@ -43,17 +39,17 @@ function nextQuestion(code) {
   room.questionIndex += 1;
   room.answers = {};
 
-  if (room.questionIndex >= questions.length) {
+  if (room.questionIndex >= room.questions.length) {
     io.to(code).emit('game:over', { leaderboard: getLeaderboard(room) });
     room.started = false;
     return;
   }
 
-  const q = questions[room.questionIndex];
+  const q = room.questions[room.questionIndex];
   room.questionStartedAt = Date.now();
   io.to(code).emit('game:question', {
     index: room.questionIndex,
-    total: questions.length,
+    total: room.questions.length,
     question: q.question,
     options: q.options,
     timeLimitMs: QUESTION_TIME_MS,
@@ -66,12 +62,11 @@ function finishQuestion(code) {
   if (!room) return;
   clearTimeout(room.timer);
 
-  const q = questions[room.questionIndex];
+  const q = room.questions[room.questionIndex];
   for (const [id, player] of Object.entries(room.players)) {
     const ans = room.answers[id];
     if (ans && ans.answerIndex === q.correctIndex) {
-      const speedBonus = Math.max(0, 1 - ans.elapsed / QUESTION_TIME_MS);
-      player.score += Math.round(10 + speedBonus * 10);
+      player.score += calculatePoints(ans.elapsed, QUESTION_TIME_MS);
     }
   }
 
@@ -85,7 +80,7 @@ function finishQuestion(code) {
 
 io.on('connection', (socket) => {
   socket.on('host:createRoom', () => {
-    const code = generateRoomCode();
+    const code = generateRoomCode((c) => Boolean(rooms[c]));
     rooms[code] = {
       hostId: socket.id,
       players: {},
@@ -94,11 +89,12 @@ io.on('connection', (socket) => {
       started: false,
       timer: null,
       nextTimer: null,
+      questions: [],
     };
     socket.join(code);
     socket.data.roomCode = code;
     socket.data.role = 'host';
-    socket.emit('host:roomCreated', { code });
+    socket.emit('host:roomCreated', { code, packs: packList });
   });
 
   socket.on('player:joinRoom', ({ code, name }) => {
@@ -124,7 +120,7 @@ io.on('connection', (socket) => {
     io.to(room.hostId).emit('host:playersUpdate', getLeaderboard(room));
   });
 
-  socket.on('host:startGame', () => {
+  socket.on('host:startGame', ({ packId }) => {
     const code = socket.data.roomCode;
     const room = rooms[code];
     if (!room || socket.id !== room.hostId) return;
@@ -132,6 +128,12 @@ io.on('connection', (socket) => {
       socket.emit('host:error', { message: 'Нет игроков в комнате' });
       return;
     }
+    const pack = packs[packId];
+    if (!pack) {
+      socket.emit('host:error', { message: 'Выберите тему викторины' });
+      return;
+    }
+    room.questions = pack.questions;
     room.started = true;
     nextQuestion(code);
   });

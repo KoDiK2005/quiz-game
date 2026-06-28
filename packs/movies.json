@@ -1,0 +1,35 @@
+{
+  "topic": "Кино и видеоигры",
+  "questions": [
+    {
+      "question": "Какая компания создала серию игр Assassin's Creed?",
+      "options": ["Ubisoft", "Rockstar Games", "Electronic Arts", "Activision"],
+      "correctIndex": 0
+    },
+    {
+      "question": "В каком году вышел первый фильм Marvel Cinematic Universe («Железный человек»)?",
+      "options": ["2008", "2012", "2005", "1999"],
+      "correctIndex": 0
+    },
+    {
+      "question": "Какая студия создала игру Minecraft?",
+      "options": ["Mojang", "Valve Corporation", "Rockstar Games", "Blizzard Entertainment"],
+      "correctIndex": 0
+    },
+    {
+      "question": "В каком году вышел фильм «Терминатор»?",
+      "options": ["1984", "1991", "2003", "2019"],
+      "correctIndex": 0
+    },
+    {
+      "question": "Какая студия создала первую игру Call of Duty?",
+      "options": ["Infinity Ward", "Treyarch", "Sledgehammer Games", "Activision"],
+      "correctIndex": 0
+    },
+    {
+      "question": "В каком году вышел фильм «Матрица»?",
+      "options": ["1999", "2003", "2012", "2019"],
+      "correctIndex": 0
+    }
+  ]
+}

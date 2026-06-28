@@ -11,10 +11,13 @@ $('createRoomBtn').addEventListener('click', () => {
   socket.emit('host:createRoom');
 });
 
-socket.on('host:roomCreated', ({ code }) => {
+socket.on('host:roomCreated', ({ code, packs }) => {
   $('setup').classList.add('hidden');
   $('lobby').classList.remove('hidden');
   $('roomCode').textContent = code;
+  $('packSelect').innerHTML = packs
+    .map((p) => `<option value="${p.id}">${escapeHtml(p.topic)} (${p.count} вопросов)</option>`)
+    .join('');
 });
 
 socket.on('host:playersUpdate', (players) => {
@@ -24,7 +27,7 @@ socket.on('host:playersUpdate', (players) => {
 });
 
 $('startBtn').addEventListener('click', () => {
-  socket.emit('host:startGame');
+  socket.emit('host:startGame', { packId: $('packSelect').value });
 });
 
 socket.on('host:error', ({ message }) => alert(message));

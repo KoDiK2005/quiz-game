@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Квиз — Игрок</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+  <h1>Квиз-игра</h1>
+
+  <div id="joinForm">
+    <input id="nameInput" placeholder="Твоё имя" maxlength="16">
+    <input id="codeInput" placeholder="Код комнаты" maxlength="4">
+    <button id="joinBtn">Войти</button>
+    <p id="joinError" class="error"></p>
+  </div>
+
+  <div id="waitingArea" class="hidden">
+    <p class="center">Ждём начала игры...</p>
+  </div>
+
+  <div id="questionArea" class="hidden">
+    <p id="questionCounter" class="center"></p>
+    <h2 id="questionText"></h2>
+    <div id="optionsButtons"></div>
+    <p id="answeredMsg" class="hidden center">Ответ отправлен!</p>
+  </div>
+
+  <div id="resultArea" class="hidden">
+    <h2>Результаты раунда</h2>
+    <ol id="leaderboard"></ol>
+  </div>
+
+  <div id="finalArea" class="hidden">
+    <h2>Игра окончена!</h2>
+    <ol id="finalLeaderboard"></ol>
+  </div>
+</div>
+<script src="/socket.io/socket.io.js"></script>
+<script src="player.js"></script>
+</body>
+</html>

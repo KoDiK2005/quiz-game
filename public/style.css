@@ -1,0 +1,99 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: #1e1b4b;
+  color: #f1f5f9;
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+}
+
+.container {
+  width: 100%;
+  max-width: 480px;
+  padding: 24px;
+}
+
+h1, h2, h3 {
+  text-align: center;
+}
+
+button {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  margin: 8px 0;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  background: #6366f1;
+  color: #fff;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #4f46e5;
+}
+
+input {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #4338ca;
+  background: #312e81;
+  color: #fff;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.error {
+  color: #f87171;
+  text-align: center;
+}
+
+ul, ol {
+  padding-left: 0;
+  list-style: none;
+}
+
+#playerList li, #leaderboard li, #finalLeaderboard li {
+  background: #312e81;
+  padding: 10px 14px;
+  margin: 6px 0;
+  border-radius: 8px;
+}
+
+#optionsList li {
+  background: #312e81;
+  padding: 12px 14px;
+  margin: 6px 0;
+  border-radius: 8px;
+}
+
+#optionsButtons button {
+  text-align: left;
+  background: #312e81;
+}
+
+#optionsButtons button:hover {
+  background: #4338ca;
+}
+
+#roomCode {
+  font-size: 2em;
+  letter-spacing: 4px;
+  color: #fbbf24;
+}
+
+.center {
+  text-align: center;
+}

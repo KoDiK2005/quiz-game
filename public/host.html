@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Квиз — Ведущий</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+  <h1>Панель ведущего</h1>
+
+  <div id="setup">
+    <button id="createRoomBtn">Создать комнату</button>
+  </div>
+
+  <div id="lobby" class="hidden">
+    <h2>Код комнаты: <span id="roomCode"></span></h2>
+    <p class="center">Игроки заходят на сайт, выбирают «Я игрок» и вводят этот код.</p>
+    <h3>Игроки в комнате:</h3>
+    <ul id="playerList"></ul>
+    <button id="startBtn">Начать игру</button>
+  </div>
+
+  <div id="gameArea" class="hidden">
+    <p id="questionCounter" class="center"></p>
+    <h2 id="questionText"></h2>
+    <ul id="optionsList"></ul>
+    <p id="answerCount" class="center"></p>
+  </div>
+
+  <div id="resultArea" class="hidden">
+    <h2>Результаты раунда</h2>
+    <ol id="leaderboard"></ol>
+  </div>
+
+  <div id="finalArea" class="hidden">
+    <h2>Игра окончена!</h2>
+    <ol id="finalLeaderboard"></ol>
+  </div>
+</div>
+<script src="/socket.io/socket.io.js"></script>
+<script src="host.js"></script>
+</body>
+</html>

@@ -1,6 +1,7 @@
 /* Manual end-to-end smoke test (not run by `npm test`).
  * Boots the real server, connects a host + a player via socket.io-client,
- * plays through one question, and asserts the room flow works.
+ * plays through an ENTIRE pack (all questions to game:over), and asserts
+ * the full room/scoring flow works, not just the first question.
  * Usage: node test/smoke.manual.js
  */
 const { io: ioClient } = require('socket.io-client');
@@ -19,6 +20,7 @@ const host = ioClient(URL);
 const player = ioClient(URL);
 let roomCode;
 let packId;
+let questionsSeen = 0;
 
 host.on('connect', () => host.emit('host:createRoom'));
 
@@ -37,15 +39,21 @@ player.on('player:joined', () => {
 
 player.on('player:joinError', ({ message }) => fail(`join error: ${message}`));
 
-player.on('game:question', ({ question, options }) => {
-  console.log('Got question:', question, options);
+player.on('game:question', ({ index, total, question }) => {
+  questionsSeen += 1;
+  console.log(`Question ${index + 1}/${total}:`, question);
   player.emit('player:submitAnswer', { answerIndex: 0 });
 });
 
 player.on('game:questionResult', ({ leaderboard }) => {
-  console.log('Round result, leaderboard:', leaderboard);
-  console.log('PASS: full host/player/question/score round-trip works');
+  console.log('  -> round result, leaderboard:', leaderboard);
+});
+
+player.on('game:over', ({ leaderboard }) => {
+  console.log('Game over, final leaderboard:', leaderboard);
+  if (questionsSeen === 0) fail('never received any questions');
+  console.log(`PASS: played through all ${questionsSeen} questions to game:over`);
   process.exit(0);
 });
 
-setTimeout(() => fail('timed out waiting for full round-trip'), 10000);
+setTimeout(() => fail('timed out waiting for full round-trip'), 60000);
